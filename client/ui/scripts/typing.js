@@ -16,19 +16,51 @@ function renderText() {
 
 function updateCaret() {
     const chars = document.querySelectorAll(".char");
-    if (index >= chars.length) return;
+    const containerRect = document
+        .getElementById("text-container")
+        .getBoundingClientRect();
 
-    const rect = chars[index].getBoundingClientRect();
-    const parentRect = textDiv.getBoundingClientRect();
+    if (chars.length === 0) return;
 
-    caret.style.left = rect.left - parentRect.left + "px";
-    caret.style.top = rect.top - parentRect.top + "px";
+    if (index === 0) {
+        const first = chars[0];
+        const rect = first.getBoundingClientRect();
+
+        caret.style.left = "0px";
+        caret.style.top = (rect.top - containerRect.top) + "px";
+        caret.style.height = rect.height + "px";
+        return;
+    }
+
+    const prev = chars[index - 1];
+    const rect = prev.getBoundingClientRect();
+
+    caret.style.left =
+        (rect.left - containerRect.left + rect.width) + "px";
+    caret.style.top =
+        (rect.top - containerRect.top) + "px";
+    caret.style.height = rect.height + "px";
 }
 
 document.addEventListener("keydown", (e) => {
-    if (index >= text.length) return;
-
     const chars = document.querySelectorAll(".char");
+
+    if (e.key === "Backspace") {
+        if (index === 0) return;
+
+        index--;
+
+        chars[index].classList.remove("correct");
+        chars[index].classList.remove("incorrect");
+
+        updateCaret();
+        e.preventDefault();
+        return;
+    }
+
+    if (index >= text.length) return;
+    if (e.key.length !== 1) return;
+
     const char = chars[index];
 
     if (e.key === text[index]) {

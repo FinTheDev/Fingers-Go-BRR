@@ -24,7 +24,7 @@ body {
 }
 
 #text {
-    font-size: 24px;
+    font-size: 50px;
     line-height: 1.5;
     word-wrap: break-word;
 }
@@ -43,9 +43,9 @@ body {
 
 #caret {
     position: absolute;
-    width: 2px;
-    height: 1.5em;
+    width: 5px;
     background: #eaeaea;
+    z-index: 10;
     animation: blink 1s step-end infinite;
 }
 
