@@ -83,7 +83,6 @@ document.addEventListener("keydown", (e) => {
 
         totalTyped--;
         updateCaret();
-        updateStats();
         e.preventDefault();
         return;
     }
