@@ -1,8 +1,15 @@
+@font-face {
+    font-family: "Lexend Deca";
+    src: url("../fonts/LexendDecaRegular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     margin: 0;
     background: #0f0f0f;
     color: #eaeaea;
-    font-family: system-ui, sans-serif;
+    font-family: "Lexend Deca", sans-serif;
 }
 
 #app {
