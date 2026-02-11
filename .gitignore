@@ -4,7 +4,6 @@ __pycache__/
 *.db
 .env
 .venv/
-run.sh
 venv/
 node_modules/
 dist/

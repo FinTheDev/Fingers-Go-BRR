@@ -19,8 +19,17 @@ async function loadRandomWords(count = 30) {
     const words = await window.pywebview.api.get_words();
 
     const chosen = [];
+    let lastWord = null;
+
     for (let i = 0; i < count; i++) {
-        chosen.push(words[Math.floor(Math.random() * words.length)]);
+        let w;
+
+        do {
+            w = words[Math.floor(Math.random() * words.length)];
+        } while (w === lastWord);
+
+        chosen.push(w);
+        lastWord = w;
     }
 
     return chosen.join(" ");
