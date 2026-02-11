@@ -87,7 +87,13 @@ function updateScroll() {
     track.style.transform = `translateX(${offset}px)`;
 }
 
-document.addEventListener("keydown", (e) => {
+document.addEventListener("keydown", async (e) => {
+    if (e.key === "Tab") {
+        e.preventDefault();
+        init();
+        return;
+    }
+
     const chars = document.querySelectorAll(".char");
 
     if (e.key === "Backspace") {
