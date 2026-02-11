@@ -15,12 +15,23 @@ body {
 #app {
     max-width: 800px;
     margin: 0 auto;
-    padding-top: 40vh;
-    position: relative;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 #text-container {
     position: relative;
+    overflow: hidden;
+}
+
+#text-track {
+    display: inline-block;
+    white-space: nowrap;
+    will-change: transform;
+    transition: transform 0.12s ease-out;
 }
 
 #stats {
@@ -34,7 +45,10 @@ body {
 #text {
     font-size: 50px;
     line-height: 1.5;
-    word-wrap: break-word;
+
+    white-space: normal;
+    word-break: keep-all;
+    overflow-wrap: normal;
 }
 
 .char {
@@ -51,11 +65,14 @@ body {
 
 #caret {
     position: absolute;
-    width: 5px;
+    width: 2px;
+    height: 1em;
     background: #eaeaea;
     z-index: 10;
     animation: blink 1s step-end infinite;
+    pointer-events: none;
 }
+
 
 @keyframes blink {
     50% {

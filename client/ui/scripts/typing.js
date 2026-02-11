@@ -1,6 +1,9 @@
-const text = "finger go brr but with skill";
+let text = "";
 const textDiv = document.getElementById("text");
+
 const caret = document.getElementById("caret");
+const CARET_X_RATIO = 0.3;
+
 const wpmEl = document.getElementById("wpm");
 const accEl = document.getElementById("acc");
 
@@ -10,42 +13,45 @@ let totalTyped = 0;
 
 let index = 0;
 
+let cursorX = 0;
+
+async function loadRandomWords(count = 30) {
+    const words = await window.pywebview.api.get_words();
+
+    const chosen = [];
+    for (let i = 0; i < count; i++) {
+        chosen.push(words[Math.floor(Math.random() * words.length)]);
+    }
+
+    return chosen.join(" ");
+}
+
 function renderText() {
     textDiv.innerHTML = "";
+
     for (let i = 0; i < text.length; i++) {
         const span = document.createElement("span");
         span.classList.add("char");
-        span.textContent = text[i];
+
+        if (text[i] === " ") {
+            span.innerHTML = "&nbsp;";
+        } else {
+            span.textContent = text[i];
+        }
+
         textDiv.appendChild(span);
     }
 }
 
 function updateCaret() {
     const chars = document.querySelectorAll(".char");
-    const containerRect = document
-        .getElementById("text-container")
-        .getBoundingClientRect();
-
     if (chars.length === 0) return;
 
-    if (index === 0) {
-        const first = chars[0];
-        const rect = first.getBoundingClientRect();
+    const ref = index === 0 ? chars[0] : chars[index - 1];
 
-        caret.style.left = "0px";
-        caret.style.top = (rect.top - containerRect.top) + "px";
-        caret.style.height = rect.height + "px";
-        return;
-    }
-
-    const prev = chars[index - 1];
-    const rect = prev.getBoundingClientRect();
-
-    caret.style.left =
-        (rect.left - containerRect.left + rect.width) + "px";
-    caret.style.top =
-        (rect.top - containerRect.top) + "px";
-    caret.style.height = rect.height + "px";
+    caret.style.left = cursorX + "px";
+    caret.style.top = ref.offsetTop + "px";
+    caret.style.height = ref.offsetHeight + "px";
 }
 
 function updateStats() {
@@ -66,6 +72,21 @@ function updateStats() {
     accEl.textContent = `${accuracy}%`;
 }
 
+function updateScroll() {
+    const track = document.getElementById("text-track");
+    const chars = document.querySelectorAll(".char");
+
+    let textX = 0;
+
+    if (index > 0) {
+        const prev = chars[index - 1];
+        textX = prev.offsetLeft + prev.offsetWidth;
+    }
+
+    const offset = cursorX - textX;
+    track.style.transform = `translateX(${offset}px)`;
+}
+
 document.addEventListener("keydown", (e) => {
     const chars = document.querySelectorAll(".char");
 
@@ -81,8 +102,9 @@ document.addEventListener("keydown", (e) => {
         chars[index].classList.remove("correct");
         chars[index].classList.remove("incorrect");
 
-        totalTyped--;
+        totalTyped = Math.max(0, totalTyped - 1);
         updateCaret();
+        updateScroll();
         e.preventDefault();
         return;
     }
@@ -107,10 +129,37 @@ document.addEventListener("keydown", (e) => {
     index++;
 
     updateCaret();
+    updateScroll();
 });
 
 setInterval(updateStats, 1000)
 
-renderText();
-index = 0;
-requestAnimationFrame(updateCaret);
+async function init() {
+    text = await loadRandomWords(30);
+    renderText();
+    
+    cursorX = document.getElementById("text-container").clientWidth * 0.3;
+
+    index = 0;
+    startTime = null;
+    correctCount = 0;
+    totalTyped = 0;
+
+    requestAnimationFrame(() => {
+        updateCaret();
+        updateScroll();
+    });
+
+    wpmEl.textContent = "0 WPM";
+    accEl.textContent = "100%";
+}
+
+function startApp() {
+    init();
+}
+
+if (window.pywebview) {
+    startApp();
+} else {
+    window.addEventListener("pywebviewready", startApp);
+}
